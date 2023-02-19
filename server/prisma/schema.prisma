@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int    @id @default(autoincrement())
+  email        String @db.VarChar()
+  password     String @db.VarChar(32)
+  shorterLinks Link[]
+  Plan         Plan?
+  Role         Role?  @default(User)
+}
+
+enum Role {
+  User
+  Admin
+}
+
+model Plan {
+  id        Int      @id @default(autoincrement())
+  expiresAt DateTime @db.Date
+  planType  PlanType
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @unique
+}
+
+enum PlanType {
+  Bronze
+  Gold
+  Diamond
+  Free
+}
+
+model Link {
+  id          Int      @id @unique @default(autoincrement())
+  sourceLink  String   @db.VarChar()
+  destinyLink String   @unique @db.VarChar()
+  expiresIn   DateTime @db.Date
+  User        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int?
+}
