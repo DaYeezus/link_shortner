@@ -13,7 +13,7 @@ async function bootstrap() {
     await prismaClient.$connect().then(() => {
       console.log('Prisma Connected');
     });
-    server.listen({port: 3000}, (err, address) => {
+    server.listen({port: 5000}, (err, address) => {
       if (err) throw err;
       console.log(`server listening on ${address}`);
     });
