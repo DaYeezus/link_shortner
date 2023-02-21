@@ -10,7 +10,7 @@ datasource db {
 model User {
   id           Int    @id @default(autoincrement())
   email        String @db.VarChar()
-  password     String @db.VarChar(32)
+  password     String @db.VarChar()
   shorterLinks Link[]
   Plan         Plan?
   Role         Role?  @default(User)

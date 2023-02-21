@@ -1,36 +1,75 @@
-import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
+import {FastifyReply, FastifyRequest} from "fastify";
 import AuthService from "../services/auth.service";
+import {
+    forgotPasswordBodyType,
+    loginSchemaType,
+    registerSchemaType,
+    resetPasswordBodyType
+} from "../schemas/auth.schema";
+import {jwtTokenSchema, jwtTokenSchemaType} from "../schemas/global.schema";
 
 export default class AuthController {
-    private readonly _serverInstance:FastifyInstance;
-    private readonly _authService:AuthService;
-    constructor(private readonly serverInstance:FastifyInstance) {
-        this._serverInstance= this.serverInstance
-        this._authService = new AuthService()
+
+
+    async register(req: FastifyRequest, rep: FastifyReply) {
+        try {
+            const bodyData = req.body as registerSchemaType
+            await AuthService.register(bodyData)
+            return rep.status(200).send({
+                message: "Registered successfully"
+            })
+        } catch (err: any) {
+            rep.code(500).send({
+                message: err?.message,
+            });
+        }
     }
 
-    public async register(req: FastifyRequest, rep: FastifyReply){
+    async login(req: FastifyRequest, rep: FastifyReply) {
         try {
-        } catch (err) {
+            const bodyData = req.body as loginSchemaType
+            const userId = await AuthService.login(bodyData)
+            const token = req.server.jwt.sign({id: userId.toString()})
+            return rep.status(200).send({
+                message: "Registered successfully",
+                token
+            })
+        } catch (err: any) {
             rep.code(500).send({
-                message: err,
+                message: err?.message,
             });
         }
     }
-    public async login(req: FastifyRequest, rep: FastifyReply){
+
+    async forgetPassword(req: FastifyRequest, rep: FastifyReply) {
         try {
-        } catch (err) {
+            const bodyData = req.body as forgotPasswordBodyType
+            console.log('controller')
+            await AuthService.forgotPassword(bodyData, req.server.jwt)
+            return rep.status(200).send({
+                message: "Check your email inbox we have sent you a link"
+            })
+        } catch (err: any) {
             rep.code(500).send({
-                message: err,
+                message: err?.message,
             });
         }
     }
-    public async logout(req: FastifyRequest, rep: FastifyReply){
+
+    async resetPassword(req: FastifyRequest, rep: FastifyReply) {
         try {
-        } catch (err) {
+            const bodyData = req.body as resetPasswordBodyType
+            const {token} = req.query as { token: jwtTokenSchemaType }
+            await jwtTokenSchema.parseAsync(token)
+            await AuthService.resetPassword(bodyData, token, req.server.jwt)
+            return rep.status(200).send({
+                message: "Your password has been reset"
+            })
+        } catch (err: any) {
             rep.code(500).send({
-                message: err,
+                message: err?.message,
             });
         }
     }
+
 }
