@@ -1,4 +1,4 @@
-import {
+import  {
     forgotPasswordBodyType,
     loginSchemaType,
     registerSchemaType,
@@ -24,7 +24,9 @@ export default class AuthService {
         await prismaClient.user.create({
             data: {
                 email,
-                password: hashedPassword
+                password: hashedPassword,
+                Plan:"Free"
+
             }
         }).catch(err => {
             throw new Error(err)

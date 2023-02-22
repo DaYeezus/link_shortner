@@ -8,12 +8,12 @@ datasource db {
 }
 
 model User {
-  id           Int    @id @default(autoincrement())
-  email        String @db.VarChar()
-  password     String @db.VarChar()
+  id           Int      @id @default(autoincrement())
+  email        String   @db.VarChar()
+  password     String   @db.VarChar()
   shorterLinks Link[]
-  Plan         Plan?
-  Role         Role?  @default(User)
+  Plan         PlanType @default(Free)
+  Role         Role?    @default(User)
 }
 
 enum Role {
@@ -21,18 +21,8 @@ enum Role {
   Admin
 }
 
-model Plan {
-  id        Int      @id @default(autoincrement())
-  expiresAt DateTime @db.Date
-  planType  PlanType
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int      @unique
-}
-
 enum PlanType {
-  Bronze
-  Gold
-  Diamond
+  Premium
   Free
 }
 
